@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" 
+     xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" 
+     xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>JOIX Commentary Feed</title>
+    <link>https://wpoates1.github.io/joix/podcast/rss.xml</link>
+    <language>en-us</language>
+    <itunes:author>JOIX Curator</itunes:author>
+    <description>Thematic serendipity music discovery transition voice bridges for JOIX playlists.</description>
+    <itunes:summary>Narrative bridges linking music tracks on the JOIX show.</itunes:summary>
+    <itunes:image href="https://wpoates1.github.io/joix/podcast/cover.jpg" />
+    <itunes:category text="Music" />
+
+  </channel>
+</rss>
