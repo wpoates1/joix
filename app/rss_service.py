@@ -3,7 +3,7 @@ import time
 import email.utils
 from pathlib import Path
 from xml.sax.saxutils import escape
-from app.storage import load_history, load_current_joix, BASE_DIR
+from app.storage import load_history, load_current_joix, BASE_DIR, get_config
 from app.git_service import get_github_pages_info
 
 PODCAST_DIR = BASE_DIR / "podcast"
@@ -91,6 +91,9 @@ def generate_podcast_rss():
     </item>""")
 
     # Build the final XML structure
+    config = get_config()
+    owner_email = config.get("podcast_owner_email") or "bill.oates@projectivegroup.com"
+    
     rss_header = f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" 
      xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" 
@@ -104,6 +107,10 @@ def generate_podcast_rss():
     <itunes:summary>Narrative bridges linking music tracks on the JOIX show.</itunes:summary>
     <itunes:image href="{base_url}/podcast/cover.jpg" />
     <itunes:category text="Music" />
+    <itunes:owner>
+      <itunes:name>JOIX Curator</itunes:name>
+      <itunes:email>{owner_email}</itunes:email>
+    </itunes:owner>
 """
 
     rss_footer = """  </channel>

@@ -26,6 +26,7 @@ def get_config():
         "elevenlabs_api_key": os.getenv("ELEVENLABS_API_KEY"),
         "elevenlabs_voice_id": os.getenv("ELEVENLABS_VOICE_ID"),
         "playlist_master_name": os.getenv("PLAYLIST_MASTER_NAME", "JOIX Master"),
+        "podcast_owner_email": os.getenv("PODCAST_OWNER_EMAIL"),
     }
 
 def load_current_joix():
