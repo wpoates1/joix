@@ -88,5 +88,13 @@ def publish_to_github(commit_message: str):
             raise e
             
     print("Pushing to remote GitHub repository...")
-    run_git_command(["push"], base_dir)
+    try:
+        # Get active branch name dynamically (e.g. master or main)
+        branch = run_git_command(["rev-parse", "--abbrev-ref", "HEAD"], base_dir)
+        # Push and set upstream to origin
+        run_git_command(["push", "-u", "origin", branch], base_dir)
+    except Exception as push_err:
+        # Fallback to simple push if set-upstream fails
+        print(f"Set-upstream push failed, trying generic push: {push_err}")
+        run_git_command(["push"], base_dir)
     print("Successfully pushed to GitHub Pages!")

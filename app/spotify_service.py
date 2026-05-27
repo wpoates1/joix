@@ -98,9 +98,18 @@ def search_podcast_episodes(joix_id: str) -> list:
         list of dict: Episode items found
     """
     sp = get_spotify_client()
+    
+    # Episode search on Spotify Web API strictly requires a market. 
+    # We retrieve the user's country code to specify the market.
+    try:
+        user_info = sp.current_user()
+        market = user_info.get("country", "US")
+    except Exception:
+        market = "US"
+        
     # Search globally for the issue identifier
     query = f"Joix #{joix_id}"
-    results = sp.search(q=query, type="episode", limit=50)
+    results = sp.search(q=query, type="episode", limit=50, market=market)
     
     episodes = results.get("episodes", {}).get("items", [])
     

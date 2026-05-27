@@ -3,7 +3,6 @@ venv/
 data/
 output/
 __pycache__/
-*.mp3
 .spotify_cache
 .cache
 .pytest_cache/
