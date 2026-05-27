@@ -84,6 +84,16 @@ def get_status():
         "next_issue_number": next_issue
     }
 
+@app.get("/api/podcast-rss-url")
+def api_podcast_rss_url():
+    """Returns the public RSS feed URL for the podcast hosted on GitHub Pages."""
+    try:
+        from app.git_service import get_github_pages_info
+        base_url, _, _ = get_github_pages_info()
+        return {"rss_url": f"{base_url}/podcast/rss.xml"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/spotify/login")
 def spotify_login():
     """Generates the authorization URL to log the user into Spotify."""

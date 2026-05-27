@@ -2,11 +2,15 @@ import os
 import re
 import requests
 from pathlib import Path
-from app.storage import get_config, OUTPUT_DIR
+from app.storage import get_config
+from app.rss_service import EPISODES_DIR, PODCAST_DIR, generate_podcast_rss
+from app.git_service import publish_to_github
 
 def sanitize_filename(title: str) -> str:
     """Sanitizes filename so it contains only alphanumeric characters, underscores, and hyphens."""
-    return re.sub(r'[^a-z0-9_-]', '', title.lower().replace(' ', '_'))
+    # Convert spaces to underscores, remove colons and non-alphanumeric chars
+    title_lower = title.lower().replace(' ', '_').replace(':', '')
+    return re.sub(r'[^a-z0-9_-]', '', title_lower)
 
 def generate_voice_file(text: str, filename: str, joix_id: str) -> Path:
     """Calls the ElevenLabs API to synthesize speech from text and saves it locally.
@@ -28,8 +32,8 @@ def generate_voice_file(text: str, filename: str, joix_id: str) -> Path:
     if not voice_id:
         raise ValueError("ELEVENLABS_VOICE_ID is not configured in the environment (.env file)")
         
-    # Setup folders
-    joix_output_dir = OUTPUT_DIR / f"joix_{joix_id}"
+    # Setup folders inside the podcast directory (which is pushed to Git)
+    joix_output_dir = EPISODES_DIR / f"joix_{joix_id}"
     joix_output_dir.mkdir(exist_ok=True)
     
     output_filepath = joix_output_dir / filename
@@ -67,7 +71,7 @@ def generate_voice_file(text: str, filename: str, joix_id: str) -> Path:
     return output_filepath
 
 def generate_joix_audio(joix_data: dict) -> dict:
-    """Generates all 7 voice segments and saves metadata text file for a JOIX playlist.
+    """Generates all 7 voice segments, updates the RSS feed, and publishes it to GitHub.
     
     Args:
         joix_data: The dictionary structure of the JOIX playlist.
@@ -96,8 +100,8 @@ def generate_joix_audio(joix_data: dict) -> dict:
         chunk["audio_generated"] = True
         chunk["audio_path"] = str(audio_path)
         
-    # Write metadata file for user upload
-    joix_output_dir = OUTPUT_DIR / f"joix_{joix_id}"
+    # Write metadata file for user upload reference
+    joix_output_dir = EPISODES_DIR / f"joix_{joix_id}"
     metadata_file = joix_output_dir / "spotify_podcast_metadata.txt"
     
     with open(metadata_file, "w", encoding="utf-8") as f:
@@ -111,4 +115,16 @@ def generate_joix_audio(joix_data: dict) -> dict:
             f.write("\n\n" + "="*50 + "\n\n")
             
     joix_data["status"] = "audio_generated"
+    
+    # 1. Regenerate local rss.xml
+    print("Rebuilding RSS xml...")
+    generate_podcast_rss()
+    
+    # 2. Push files and RSS to GitHub Pages
+    try:
+        print("Publishing to GitHub Pages...")
+        publish_to_github(f"Publish JOIX #{joix_id} audio and update RSS feed")
+    except Exception as e:
+        print(f"Warning: Git push failed: {e}. (Please ensure git remote is configured and you have push access).")
+        
     return joix_data

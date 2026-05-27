@@ -89,12 +89,13 @@
 
       <!-- INSTRUCTIONS ON PODCAST UPLOAD PROCESS -->
       <div id="draft-workflow-notes" style="margin-bottom: 2rem; padding: 1.25rem; border-radius: var(--border-radius-md); background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); font-size: 0.9rem; line-height: 1.5;">
-        <span style="font-weight: 700; color: var(--accent-cyan);">🎧 Dynamic Podcast Workflow:</span>
+        <span style="font-weight: 700; color: var(--accent-cyan);">🎧 Automated GitHub Pages Podcast Workflow:</span>
         <ol style="margin-left: 1.5rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.35rem;">
           <li>Review the generated music tracks and transition texts below. You can search/swap tracks and edit script text.</li>
-          <li>Click <strong>Generate Voice MP3s</strong> in the control bar. ElevenLabs will save the files inside your local project output folder.</li>
-          <li>Open the output folder, copy the descriptions, and manually upload the 7 MP3s to your podcast publisher (Spotify for Podcasters).</li>
-          <li>Once published (they show up on Spotify search), click <strong>Publish to Spotify</strong> to construct the Master playlist.</li>
+          <li>Click <strong>Generate Voice MP3s</strong> in the control bar. ElevenLabs will save the files inside the <code>podcast/episodes/</code> folder, regenerate your <code>rss.xml</code> feed, and auto-push it to GitHub Pages.</li>
+          <li>Your public RSS feed URL: <strong id="rss-feed-url-display" style="color:var(--accent-purple); word-break:break-all;">Loading RSS feed link...</strong></li>
+          <li><em>Setup Note:</em> You must register this RSS URL once inside your <strong>Spotify for Creators</strong> account. Spotify will fetch new episodes from here automatically.</li>
+          <li>Spotify crawls the feed automatically (usually takes 10 to 30 mins). Click <strong>Check Spotify Episodes</strong> once published to automatically sync and rebuild the master playlist.</li>
         </ol>
       </div>
 

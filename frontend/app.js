@@ -104,6 +104,18 @@ async function loadAppStatus() {
       elActiveDraftPanel.style.display = 'none';
       elControlFooter.classList.remove('visible');
     }
+    
+    // Fetch RSS URL
+    try {
+      const rssRes = await fetch('/api/podcast-rss-url');
+      const rssData = await rssRes.json();
+      const elRssDisplay = document.getElementById('rss-feed-url-display');
+      if (elRssDisplay && rssData.rss_url) {
+        elRssDisplay.innerText = rssData.rss_url;
+      }
+    } catch (rssErr) {
+      console.warn("Could not load RSS feed URL:", rssErr);
+    }
   } catch (err) {
     console.error("Error fetching app status:", err);
   }
@@ -371,7 +383,7 @@ async function triggerVoiceSynthesis() {
     activeDraft = data;
     renderActiveDraft();
     
-    alert("ElevenLabs audio files successfully generated!\n\nCheck the output/joix_" + activeDraft.id + " folder for the MP3 files and metadata sheet. Please upload them to Spotify for Podcasters.");
+    alert("ElevenLabs audio files successfully generated and published!\n\nAll voice files have been saved to podcast/episodes/, the rss.xml feed was rebuilt, and all changes have been pushed to GitHub Pages.\n\nNow, wait a few minutes for Spotify to crawl and index your new episodes, then click the 'Publish Playlist' button.");
     
   } catch (err) {
     alert("Speech synthesis failed: " + err.message);
