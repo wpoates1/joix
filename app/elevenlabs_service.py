@@ -120,10 +120,18 @@ def generate_joix_audio(joix_data: dict) -> dict:
     print("Rebuilding RSS xml...")
     generate_podcast_rss()
     
-    # 2. Push files and RSS to GitHub Pages
+    # 2. Regenerate static website pages
+    try:
+        print("Rebuilding static website...")
+        from app.webpage_service import generate_static_website
+        generate_static_website()
+    except Exception as ws_err:
+        print(f"Warning: Rebuilding static website failed: {ws_err}")
+    
+    # 3. Push files, RSS, and webpage to GitHub Pages
     try:
         print("Publishing to GitHub Pages...")
-        publish_to_github(f"Publish JOIX #{joix_id} audio and update RSS feed")
+        publish_to_github(f"Publish JOIX #{joix_id} audio, RSS, and webpage")
     except Exception as e:
         print(f"Warning: Git push failed: {e}. (Please ensure git remote is configured and you have push access).")
         
