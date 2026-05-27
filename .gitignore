@@ -1,0 +1,10 @@
+venv/
+.env
+data/
+output/
+__pycache__/
+*.mp3
+.spotify_cache
+.cache
+.pytest_cache/
+tests/.pytest_cache/

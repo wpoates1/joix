@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JOIX Control Center</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- HEADER -->
+    <header>
+      <h1>JOIX <span>Control Center</span></h1>
+      <div id="spotify-status" class="status-badge disconnected">
+        <span class="indicator"></span>
+        <span class="status-text">Spotify Not Connected</span>
+      </div>
+    </header>
+
+    <!-- CONFIGURATION & STATUS STATS -->
+    <section class="setup-bar">
+      <div id="cfg-gemini" class="config-card">
+        <div class="icon">🤖</div>
+        <div class="info">
+          <h4>Gemini API</h4>
+          <p id="cfg-gemini-txt">Checking status...</p>
+        </div>
+      </div>
+      <div id="cfg-elevenlabs" class="config-card">
+        <div class="icon">🎙️</div>
+        <div class="info">
+          <h4>ElevenLabs</h4>
+          <p id="cfg-elevenlabs-txt">Checking status...</p>
+        </div>
+      </div>
+      <div id="cfg-spotify" class="config-card">
+        <div class="icon">🎵</div>
+        <div class="info">
+          <h4>Spotify Client</h4>
+          <p id="cfg-spotify-txt">Checking status...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUTHENTICATION BANNER (if Spotify is not connected) -->
+    <div id="auth-banner" class="glass-panel" style="display: none; text-align: center;">
+      <h2 style="margin-bottom: 1rem; font-family: 'Space Grotesk', sans-serif;">Connect Spotify Account</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+        To build playlists, search music tracks, and link voice files, we need authorization to write to your Spotify account.
+      </p>
+      <button id="btn-connect-spotify" class="spotify-connect-btn">Connect to Spotify</button>
+    </div>
+
+    <!-- MAIN FORM FOR CREATING NEW JOIX -->
+    <section id="generator-panel" class="glass-panel" style="display: none;">
+      <h2 style="margin-bottom: 1.5rem; font-family: 'Space Grotesk', sans-serif;">Generate New JOIX Issue</h2>
+      
+      <div class="success-banner" id="callback-success" style="display: none;">
+        <span>✅ Spotify account successfully authenticated!</span>
+      </div>
+
+      <div class="form-group">
+        <div class="input-wrapper">
+          <span class="input-icon">✨</span>
+          <input type="text" id="seed-input" placeholder="Start with a theme, starting track, or concept... (e.g. Synthwave Serendipity, 'Blue Monday' by New Order)">
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <span style="font-weight: 500; font-size: 0.9rem; color: var(--text-secondary);">Issue #:</span>
+          <input type="text" id="issue-num-input" class="issue-number-input" placeholder="001">
+        </div>
+        <button id="btn-generate">Generate Draft</button>
+      </div>
+    </section>
+
+    <!-- ACTIVE DRAFT PLAYLIST TIMELINE -->
+    <section id="active-draft-panel" class="glass-panel" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 1.5rem;">
+        <div>
+          <span style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.1em; color: var(--accent-purple); font-weight: 700;">Active Workspace</span>
+          <h2 id="draft-title" style="font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; margin-top: 0.25rem;">JOIX Issue #001</h2>
+          <p id="draft-theme-label" style="font-size: 0.95rem; color: var(--text-secondary); margin-top: 0.25rem;">Theme: Synthwave Serendipity</p>
+        </div>
+        <div>
+          <span id="draft-status-badge" class="status-badge" style="background: rgba(79, 172, 254, 0.1); border-color: rgba(79, 172, 254, 0.2); color: var(--accent-purple);">Draft</span>
+        </div>
+      </div>
+
+      <!-- INSTRUCTIONS ON PODCAST UPLOAD PROCESS -->
+      <div id="draft-workflow-notes" style="margin-bottom: 2rem; padding: 1.25rem; border-radius: var(--border-radius-md); background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); font-size: 0.9rem; line-height: 1.5;">
+        <span style="font-weight: 700; color: var(--accent-cyan);">🎧 Dynamic Podcast Workflow:</span>
+        <ol style="margin-left: 1.5rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.35rem;">
+          <li>Review the generated music tracks and transition texts below. You can search/swap tracks and edit script text.</li>
+          <li>Click <strong>Generate Voice MP3s</strong> in the control bar. ElevenLabs will save the files inside your local project output folder.</li>
+          <li>Open the output folder, copy the descriptions, and manually upload the 7 MP3s to your podcast publisher (Spotify for Podcasters).</li>
+          <li>Once published (they show up on Spotify search), click <strong>Publish to Spotify</strong> to construct the Master playlist.</li>
+        </ol>
+      </div>
+
+      <!-- THE 13-NODE PLAYLIST TIMELINE -->
+      <div id="timeline-container" class="timeline">
+        <!-- Dynamic Nodes (alternating Voice and Music) will be generated here -->
+      </div>
+    </section>
+
+    <!-- HISTORICAL PUBLISHED ISSUES -->
+    <section id="history-panel" class="glass-panel" style="display: none;">
+      <h2 style="margin-bottom: 1.5rem; font-family: 'Space Grotesk', sans-serif;">Published Archive</h2>
+      <div id="history-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+        <!-- History items loaded dynamically -->
+      </div>
+    </section>
+
+  </div>
+
+  <!-- CONTROL FOOTER BAR -->
+  <div id="control-footer" class="control-footer">
+    <div class="footer-info">
+      <span class="footer-status-text" id="footer-status-txt">JOIX Draft Saved locally.</span>
+    </div>
+    <div class="footer-actions">
+      <button id="btn-save-draft" class="secondary">Save Draft</button>
+      <button id="btn-voice-synthesis">🎙️ Generate Voice MP3s</button>
+      <button id="btn-publish-playlist" class="success" style="display: none;">🚀 Publish Playlist</button>
+    </div>
+  </div>
+
+  <!-- SPOTIFY TRACK SEARCH MODAL -->
+  <div id="search-modal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">Search Spotify Track</h3>
+        <button id="btn-close-modal" class="modal-close">&times;</button>
+      </div>
+      <div style="position: relative;">
+        <span class="input-icon" style="left: 1rem;">🔍</span>
+        <input type="text" id="spotify-search-input" placeholder="Search track name, artist..." style="padding-left: 2.75rem;">
+      </div>
+      <div id="search-results" class="search-results-list">
+        <p style="text-align: center; color: var(--text-muted); padding: 2rem 0;">Type query above to search Spotify...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- GLOBAL LOADING OVERLAY -->
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loading-text">Generating thematic playlist...<br><span style="font-size: 0.9rem; font-weight: 400; color: var(--text-secondary);">This may take a moment</span></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
