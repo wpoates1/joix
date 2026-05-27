@@ -5,6 +5,7 @@ from pathlib import Path
 from xml.sax.saxutils import escape
 from app.storage import load_history, load_current_joix, BASE_DIR, get_config
 from app.git_service import get_github_pages_info
+from app.utils import sanitize_filename
 
 PODCAST_DIR = BASE_DIR / "podcast"
 EPISODES_DIR = PODCAST_DIR / "episodes"
@@ -54,7 +55,7 @@ def generate_podcast_rss():
             desc = chunk.get("spotify_description", "")
             script_text = chunk.get("script_text", "")
             
-            clean_title = title.lower().replace(" ", "_").replace(":", "").replace("#", "")
+            clean_title = sanitize_filename(title)
             filename = f"chunk_{idx}_{clean_title}.mp3"
             
             audio_file_path = EPISODES_DIR / f"joix_{joix_id}" / filename

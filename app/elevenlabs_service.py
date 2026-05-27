@@ -2,15 +2,10 @@ import os
 import re
 import requests
 from pathlib import Path
-from app.storage import get_config
+from app.storage import get_config, save_current_joix
 from app.rss_service import EPISODES_DIR, PODCAST_DIR, generate_podcast_rss
 from app.git_service import publish_to_github
-
-def sanitize_filename(title: str) -> str:
-    """Sanitizes filename so it contains only alphanumeric characters, underscores, and hyphens."""
-    # Convert spaces to underscores, remove colons and non-alphanumeric chars
-    title_lower = title.lower().replace(' ', '_').replace(':', '')
-    return re.sub(r'[^a-z0-9_-]', '', title_lower)
+from app.utils import sanitize_filename
 
 def generate_voice_file(text: str, filename: str, joix_id: str) -> Path:
     """Calls the ElevenLabs API to synthesize speech from text and saves it locally.
@@ -115,6 +110,7 @@ def generate_joix_audio(joix_data: dict) -> dict:
             f.write("\n\n" + "="*50 + "\n\n")
             
     joix_data["status"] = "audio_generated"
+    save_current_joix(joix_data)
     
     # 1. Regenerate local rss.xml
     print("Rebuilding RSS xml...")

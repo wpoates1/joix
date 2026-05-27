@@ -4,7 +4,7 @@ from spotipy.oauth2 import SpotifyOAuth
 from app.storage import get_config, DATA_DIR
 
 # Define OAuth scopes needed
-SCOPES = "playlist-read-private playlist-modify-private playlist-modify-public"
+SCOPES = "playlist-read-private playlist-modify-private playlist-modify-public ugc-image-upload"
 
 def get_oauth_manager():
     """Builds the Spotipy OAuth manager using configuration."""
@@ -107,36 +107,30 @@ def search_podcast_episodes(joix_id: str) -> list:
     except Exception:
         market = "US"
         
-    # Search globally for the issue identifier
-    query = f"Joix #{joix_id}"
-    results = sp.search(q=query, type="episode", limit=50, market=market)
-    
-    episodes = results.get("episodes", {}).get("items", [])
-    
-    # Format and filter
     formatted_episodes = []
-    for ep in episodes:
-        title = ep.get("name", "")
-        # Only collect if it belongs to this JOIX ID
-        if f"#{joix_id}." in title or f"#{joix_id}:" in title:
-            # Try to parse index from title (e.g. "Joix #012.03" -> index 3)
-            index = None
-            for i in range(1, 8):
-                if f".0{i}" in title or f".{i}" in title:
-                    index = i
-                    break
+    # Search for each of the 7 episodes specifically to avoid limit restrictions
+    # and search pollution from other podcasts
+    for i in range(1, 8):
+        query = f"Joix #{joix_id}.0{i}"
+        try:
+            results = sp.search(q=query, type="episode", limit=5, market=market)
+            episodes = results.get("episodes", {}).get("items", [])
             
-            formatted_episodes.append({
-                "index": index,
-                "title": title,
-                "spotify_id": ep.get("id"),
-                "spotify_uri": ep.get("uri"),
-                "description": ep.get("description"),
-                "release_date": ep.get("release_date")
-            })
+            for ep in episodes:
+                title = ep.get("name", "")
+                if f"#{joix_id}.0{i}" in title or f"#{joix_id}:{i}" in title or f"#{joix_id}.{i}" in title:
+                    formatted_episodes.append({
+                        "index": i,
+                        "title": title,
+                        "spotify_id": ep.get("id"),
+                        "spotify_uri": ep.get("uri"),
+                        "description": ep.get("description"),
+                        "release_date": ep.get("release_date")
+                    })
+                    break # Found the match for this index, move to next
+        except Exception as e:
+            print(f"Error searching for episode index {i}: {e}")
             
-    # Sort by index
-    formatted_episodes.sort(key=lambda x: x["index"] if x["index"] is not None else 99)
     return formatted_episodes
 
 def get_or_create_playlist(name: str) -> str:
@@ -165,8 +159,7 @@ def get_or_create_playlist(name: str) -> str:
         offset += limit
         
     # Create if not found
-    new_playlist = sp.user_playlist_create(
-        user=user_id,
+    new_playlist = sp.current_user_playlist_create(
         name=name,
         public=False,
         description=f"Automated playlist: {name}"
@@ -200,6 +193,40 @@ def determine_next_archive_number() -> int:
         
     return highest_num + 1
 
+def upload_playlist_cover(playlist_id: str):
+    """Loads, compresses, and uploads podcast/cover.jpg to Spotify as the playlist cover."""
+    sp = get_spotify_client()
+    cover_path = DATA_DIR.parent / "podcast" / "cover.jpg"
+    
+    if not cover_path.exists():
+        print(f"Playlist cover image not found at: {cover_path}")
+        return
+        
+    try:
+        from PIL import Image
+        import io
+        import base64
+        
+        img = Image.open(cover_path)
+        img = img.convert("RGB")
+        img.thumbnail((640, 640))
+        
+        buffer = io.BytesIO()
+        img.save(buffer, format="JPEG", quality=80)
+        img_bytes = buffer.getvalue()
+        
+        # Max limit is 256KB
+        if len(img_bytes) > 256 * 1024:
+            buffer = io.BytesIO()
+            img.save(buffer, format="JPEG", quality=65)
+            img_bytes = buffer.getvalue()
+            
+        img_b64 = base64.b64encode(img_bytes).decode("utf-8")
+        sp.playlist_upload_cover_image(playlist_id, img_b64)
+        print(f"Successfully uploaded cover art to playlist {playlist_id}")
+    except Exception as e:
+        print(f"Failed to upload cover art to playlist {playlist_id}: {e}")
+
 def publish_joix_playlist(joix_data: dict, podcast_episodes: list) -> dict:
     """Performs the Spotify playlist archive and Master update.
     
@@ -216,8 +243,15 @@ def publish_joix_playlist(joix_data: dict, podcast_episodes: list) -> dict:
     master_uri = get_or_create_playlist(master_name)
     master_id = master_uri.split(":")[-1]
     
-    # 2. Get master playlist contents (to copy to archive)
+    # Get master playlist contents and description (to copy to archive)
     master_tracks = []
+    master_description = ""
+    try:
+        master_details = sp.playlist(master_id, fields="description")
+        master_description = master_details.get("description", "")
+    except Exception:
+        pass
+        
     offset = 0
     while True:
         tracks_chunk = sp.playlist_items(master_id, limit=100, offset=offset)
@@ -243,6 +277,17 @@ def publish_joix_playlist(joix_data: dict, podcast_episodes: list) -> dict:
         # Add tracks to archive in chunks of 100
         for i in range(0, len(master_tracks), 100):
             sp.playlist_add_items(archive_id, master_tracks[i:i+100])
+            
+        # Copy the previous description to the archived playlist
+        if master_description:
+            try:
+                sp.playlist_change_details(archive_id, description=master_description)
+            except Exception:
+                pass
+                
+        # Upload cover art to the archive playlist
+        upload_playlist_cover(archive_id)
+        
         archive_playlist_name = archive_name
         print(f"Archived previous playlist tracks to {archive_name}")
         
@@ -278,9 +323,21 @@ def publish_joix_playlist(joix_data: dict, podcast_episodes: list) -> dict:
         raise ValueError("Missing podcast episode URI for Outro (voice segment 7)")
     new_uris.append(outro_uri)
     
-    # 5. Clear the Master playlist
-    # We replace playlist items entirely
+    # 5. Clear and populate Master playlist
     sp.playlist_replace_items(master_id, new_uris)
+    
+    # 6. Update Master description & cover art
+    issue_id = joix_data.get("id")
+    theme = joix_data.get("theme")
+    description = f"JOIX Issue #{issue_id}: {theme}. A thematic music curation weaved with transitions."
+    try:
+        sp.playlist_change_details(master_id, description=description)
+        print(f"Updated master playlist description: '{description}'")
+    except Exception as ex:
+        print(f"Failed to update playlist description: {ex}")
+        
+    # Upload custom cover art to Master
+    upload_playlist_cover(master_id)
     
     # Update joix status
     joix_data["status"] = "published"

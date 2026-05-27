@@ -221,6 +221,22 @@ def api_publish_joix(payload: SavePayload):
         add_to_history(published_joix)
         save_current_joix(None) # clear active draft
         
+        # 4. Regenerate website and RSS, then push to GitHub Pages
+        try:
+            print("Rebuilding RSS xml...")
+            from app.rss_service import generate_podcast_rss
+            generate_podcast_rss()
+            
+            print("Rebuilding static website...")
+            from app.webpage_service import generate_static_website
+            generate_static_website()
+            
+            print("Publishing to GitHub Pages...")
+            from app.git_service import publish_to_github
+            publish_to_github(f"Publish JOIX #{joix_id} playlist changes")
+        except Exception as ws_err:
+            print(f"Warning: Rebuilding static website/feed failed during publish: {ws_err}")
+            
         return {"status": "success", "published_joix": published_joix}
     except HTTPException as he:
         raise he

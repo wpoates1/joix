@@ -7,3 +7,5 @@ __pycache__/
 .cache
 .pytest_cache/
 tests/.pytest_cache/
+scratch_*.py
+scratch_*.ipynb

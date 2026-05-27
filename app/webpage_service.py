@@ -3,6 +3,7 @@ from pathlib import Path
 from xml.sax.saxutils import escape
 from app.storage import load_history, load_current_joix, BASE_DIR
 from app.git_service import get_github_pages_info
+from app.utils import sanitize_filename
 
 PODCAST_DIR = BASE_DIR / "podcast"
 PODCAST_DIR.mkdir(exist_ok=True)
@@ -255,8 +256,7 @@ def generate_issue_html(joix: dict, base_url: str):
                 script = chunk.get("script_text")
                 desc = chunk.get("spotify_description", "")
                 
-                # File references
-                clean_title = title.lower().replace(" ", "_").replace(":", "").replace("#", "")
+                clean_title = sanitize_filename(title)
                 audio_rel_path = f"episodes/joix_{joix_id}/chunk_{idx}_{clean_title}.mp3"
                 
                 # Format deep curation notes for UI if parsed from Spotify Description

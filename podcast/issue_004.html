@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JOIX Issue #004 - Northumbrian traditions - kathrun tickell, alastair anderson</title>
+  <style>
+    
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary: #08090d;
+  --bg-secondary: #111218;
+  --accent-purple: #4facfe;
+  --accent-cyan: #00f2fe;
+  --accent-magenta: #f857a6;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a5b5;
+  --text-muted: #535766;
+  --glass-bg: rgba(17, 18, 24, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --border-radius-lg: 16px;
+  --border-radius-md: 10px;
+  --border-radius-sm: 6px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(79, 172, 254, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(248, 87, 166, 0.05) 0px, transparent 50%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 3rem 1.5rem;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+header {
+  margin-bottom: 4rem;
+  text-align: center;
+}
+
+h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800;
+  font-size: 3rem;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  font-weight: 300;
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--border-radius-lg);
+  padding: 2.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  margin-bottom: 2.5rem;
+}
+
+/* Timeline grid */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.node {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.node::after {
+  content: '';
+  position: absolute;
+  left: 35px;
+  top: 50px;
+  bottom: -40px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--glass-border) 60%, transparent);
+}
+
+.node:last-child::after { display: none; }
+
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+.number {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  background: var(--bg-secondary);
+  border: 2px solid var(--glass-border);
+}
+
+.node.voice .number { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+.node.track .number { border-color: var(--accent-magenta); color: var(--accent-magenta); }
+
+.type-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 0.4rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.node-content {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-md);
+  padding: 1.5rem;
+}
+
+.node-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.script-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+  font-style: italic;
+  border-left: 2px solid var(--accent-cyan);
+  padding-left: 1rem;
+}
+
+audio {
+  width: 100%;
+  margin-top: 0.5rem;
+  outline: none;
+}
+
+/* History Card Portal */
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.portal-card {
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+
+.portal-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-purple);
+  box-shadow: 0 10px 30px rgba(79, 172, 254, 0.1);
+}
+
+.portal-card h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.portal-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.nav-link {
+  color: var(--accent-purple);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 2rem;
+}
+.nav-link:hover { text-decoration: underline; }
+
+.track-notes {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--glass-border);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.track-notes ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.track-notes li strong {
+  color: var(--accent-purple);
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="index.html" class="nav-link">&larr; Back to Directory</a>
+    
+    <article class="glass-panel">
+      <header style="margin-bottom: 2rem; text-align: left;">
+        <span style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.15em; color: var(--accent-purple); font-weight: 700;">JOIX Series</span>
+        <h1 style="text-align: left; font-size: 2.75rem; margin-top:0.25rem;">Issue #004</h1>
+        <p class="subtitle" style="font-size:1.25rem; font-weight: 500; color: var(--text-primary); margin-top:0.25rem;">Northumbrian traditions - kathrun tickell, alastair anderson</p>
+      </header>
+      
+      <div class="timeline">
+        
+      <div class="node voice">
+        <div class="badge">
+          <div class="number">1</div>
+          <span class="type-label">Voice</span>
+        </div>
+        <div class="node-content">
+          <h3 class="node-title">Intro</h3>
+          <p class="script-text">"Welcome to “Joix”—the sound of inevitable connections. Tonight, we begin deep in the resonant heart of Northumbria—a land where ancient rhythms and melodies still breathe. We open with the contemporary masters, Kathryn Tickell &amp; The Darkening, whose work on the Northumbrian smallpipes and fiddle grounds us in the very soil of tradition. This is “Stamping Ground.”"</p>
+          <audio controls src="episodes/joix_004/chunk_1_intro.mp3"></audio>
+          <div class="track-notes"><ul><li><strong>[Seed Idea]:</strong>  Establishing the foundational sound of Northumbrian folk music: drone, driving rhythm, earthy instrumentation, and a strong sense of place.</li><li><strong>[Curation Pillar]:</strong>  Human Advocacy – Highlighting artists who embody living traditions and push them forward.</li></ul></div>
+        </div>
+      </div>
+      <div class="node track">
+        <div class="badge">
+          <div class="number">1</div>
+          <span class="type-label">Music</span>
+        </div>
+        <div class="node-content">
+          <h3 class="node-title" style="margin-bottom:0.25rem;">Stamping Ground</h3>
+          <p style="color:var(--text-secondary); font-size:0.95rem;">by Kathryn Tickell &amp; The Darkening (2020)</p>
+          
+          <iframe src="https://open.spotify.com/embed/track/3U86GGu0IZtCmd1vxrK9ki?utm_source=generator" 
+                  width="100%" height="152" frameBorder="0" allowfullscreen="" 
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                  loading="lazy" style="border-radius: var(--border-radius-sm); margin-top: 1rem;"></iframe>
+        </div>
+      </div>
+      <div class="node voice">
+        <div class="badge">
+          <div class="number">2</div>
+          <span class="type-label">Voice</span>
+        </div>
+        <div class="node-content">
+          <h3 class="node-title">Link 1</h3>
+          <p class="script-text">"From the driving, earthy pulse and sustained drones of Kathryn Tickell’s Northumbrian pipes—we pivot. Not away, but inwards—to the meticulous, resonant piano work of Nils Frahm. Listen for the way Frahm’s sustained notes and building arpeggios echo the drone, while the very mechanical click of his piano keys seems to recall the physical presence of the pipes themselves. This is “Says.”"</p>
+          <audio controls src="episodes/joix_004/chunk_2_link_1.mp3"></audio>
+          <div class="track-notes"><ul><li><strong>[Harmonic Continuum]:</strong>  The sustained, almost drone-like quality of the Northumbrian pipes finds a minimalist parallel in Frahm's extended piano notes and slowly evolving arpeggios.</li><li><strong>[Timbral Echoes]:</strong>  The physical, percussive elements of the pipes (the chanter's breath, key clicks) are subtly mirrored in the resonant, almost mechanical clicks and hammers of Frahm's acoustic piano.</li></ul></div>
+        </div>
+      </div>
+      <div class="node track">
+        <div class="badge">
+          <div class="number">2</div>
+          <span class="type-label">Music</span>
+        </div>
+        <div class="node-content">
+          <h3 class="node-title" style="margin-bottom:0.25rem;">Says</h3>
+          <p style="color:var(--text-secondary); font-size:0.95rem;">by Nils Frahm (2013)</p>
+          
+          <iframe src="https://open.spotify.com/embed/track/5626KdflSKfeDK7RJQfSrE?utm_source=generator" 
+                  width="100%" height="152" frameBorder="0" allowfullscreen="" 
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                  loading="lazy" style="border-radius: var(--border-radius-sm); margin-top: 1rem;"></iframe>
+        </div>
+      </div>
+      <div class="node voice">
+        <div class="badge">
+          <div class="number">3</div>
+          <span class="type-label">Voice</span>
+        </div>
+        <div class="node-content">
+          <h3 class="node-title">Link 2</h3>
+          <p class="script-text">"The subtle, building tension—the unhurried arpeggios and resonant sustain of Nils Frahm—now expand into the vast, melancholic space of Max Richter. Here, the piano’s delicate architecture gives way to the sweeping, deeply emotional strings of “On the Nature of Daylight.” The journey remains one of unfolding soundscapes, patiently revealing their profound emotional core."</p>
+          <audio controls src="episodes/joix_004/chunk_3_link_2.mp3"></audio>
+          <div class="track-notes"><ul><li><strong>[Harmonic Continuum]:</strong>  Both tracks build slowly with sustained, evolving harmonic structures, creating a deeply immersive and melancholic atmosphere. The resonant quality of Frahm's piano expands into Richter's rich string voicings.</li><li><strong>[Kinetic Frameworks]:</strong>  The gradual, deliberate accumulation of emotional intensity and tension is a shared kinetic principle, moving from Frahm's internal build to Richter's more expansive, yet equally controlled, emotional arc.</li></ul></div>
+        </div>
+      </div>
+      <div class="node track">
+        <div class="badge">
+          <div class="number">3</div>
+          <span class="type-label">Music</span>
+        </div>
+        <div class="node-content">
+          <h3 class="node-title" style="margin-bottom:0.25rem;">On the Nature of Daylight</h3>
+          <p style="color:var(--text-secondary); font-size:0.95rem;">by Max Richter (2004)</p>
+          
+          <iframe src="https://open.spotify.com/embed/track/56oReVXIfUO9xkX7pHmEU0?utm_source=generator" 
+                  width="100%" height="152" frameBorder="0" allowfullscreen="" 
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                  loading="lazy" style="border-radius: var(--border-radius-sm); margin-top: 1rem;"></iframe>
+        </div>
+      </div>
+      <div class="node voice">
+        <div class="badge">
+          <div class="number">4</div>
+          <span class="type-label">Voice</span>
+        </div>
+        <div class="node-content">
+          <h3 class="node-title">Link 3</h3>
+          <p class="script-text">"From the profound, sweeping melancholia of Max Richter’s strings—we find a parallel depth. The sustained, expressive lines of the cello and violin now echo in the unparalleled power of the human voice. This is Mahalia Jackson. Her rendition of “Trouble of the World” carries an emotional weight so immense, so universally resonant, that it feels like a direct, inevitable continuation of Richter’s narrative."</p>
+          <audio controls src="episodes/joix_004/chunk_4_link_3.mp3"></audio>
+          <div class="track-notes"><ul><li><strong>[Timbral Echoes]:</strong>  The rich, sustained, and emotionally expressive qualities of the orchestral strings find a profound parallel in the powerful, resonant, and deeply soulful human voice of Mahalia Jackson. Both instruments 'sing' with immense feeling.</li><li><strong>[Kinetic Frameworks]:</strong>  A shared, unwavering emotional intensity drives both pieces. The narrative force of Richter's strings transitions seamlessly into the spiritual and storytelling power of Jackson's vocal performance, maintaining a powerful, if redirected, kinetic energy.</li></ul></div>
+        </div>
+      </div>
+      <div class="node track">
+        <div class="badge">
+          <div class="number">4</div>
+          <span class="type-label">Music</span>
+        </div>
+        <div class="node-content">
+          <h3 class="node-title" style="margin-bottom:0.25rem;">Trouble of the World</h3>
+          <p style="color:var(--text-secondary); font-size:0.95rem;">by Mahalia Jackson (1961)</p>
+          
+          <iframe src="https://open.spotify.com/embed/track/02oUhPB9IzkQKFgyfmVi4m?utm_source=generator" 
+                  width="100%" height="152" frameBorder="0" allowfullscreen="" 
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                  loading="lazy" style="border-radius: var(--border-radius-sm); margin-top: 1rem;"></iframe>
+        </div>
+      </div>
+      <div class="node voice">
+        <div class="badge">
+          <div class="number">5</div>
+          <span class="type-label">Voice</span>
+        </div>
+        <div class="node-content">
+          <h3 class="node-title">Link 4</h3>
+          <p class="script-text">"The raw, spiritual power of Mahalia Jackson’s voice—a beacon of human emotion—now transforms. We move into the spectral, urban soundscape of Burial. Here, “Archangel” picks up the profound resonance and the yearning quality, but filters it through processed vocal samples, deep bass, and the pervasive melancholy of a city. The human voice persists—an echo, a ghost in the machine."</p>
+          <audio controls src="episodes/joix_004/chunk_5_link_4.mp3"></audio>
+          <div class="track-notes"><ul><li><strong>[Timbral Echoes]:</strong>  The profound, sustained vocal presence and deep emotional resonance of Mahalia Jackson find an unexpected echo in Burial's spectral, processed vocal samples and the pervasive, deep bass frequencies. Both evoke a sense of yearning.</li><li><strong>[Slingshot Principle]:</strong>  This transition drastically shifts the physical energy and instrumentation from raw gospel to ethereal electronic. However, it redirects the exact emotional intensity and spiritual weight into a new, urban, and abstract sonic space, creating a powerful contrast that feels earned.</li></ul></div>
+        </div>
+      </div>
+      <div class="node track">
+        <div class="badge">
+          <div class="number">5</div>
+          <span class="type-label">Music</span>
+        </div>
+        <div class="node-content">
+          <h3 class="node-title" style="margin-bottom:0.25rem;">Archangel</h3>
+          <p style="color:var(--text-secondary); font-size:0.95rem;">by Burial (2007)</p>
+          
+          <iframe src="https://open.spotify.com/embed/track/5kadOt1O3LrIV46dns9v7u?utm_source=generator" 
+                  width="100%" height="152" frameBorder="0" allowfullscreen="" 
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                  loading="lazy" style="border-radius: var(--border-radius-sm); margin-top: 1rem;"></iframe>
+        </div>
+      </div>
+      <div class="node voice">
+        <div class="badge">
+          <div class="number">6</div>
+          <span class="type-label">Voice</span>
+        </div>
+        <div class="node-content">
+          <h3 class="node-title">Link 5</h3>
+          <p class="script-text">"From the deep, resonant frequencies and atmospheric melancholy of Burial’s urban soundscapes—we find our way back to a different kind of groundedness. Lau’s “Ghosts” takes the spirit of ancient folk—echoing the pipes and fiddles of our journey’s start—and filters it through experimental, expansive lenses. The deep bass of Burial finds its acoustic parallel in the accordion’s sustained drone, bringing us full circle, but forever changed."</p>
+          <audio controls src="episodes/joix_004/chunk_6_link_5.mp3"></audio>
+          <div class="track-notes"><ul><li><strong>[Harmonic Continuum]:</strong>  The pervasive atmospheric quality and deep resonance of Burial transition into Lau's expansive folk sound, which often features sustained accordion drones and modal melodies, echoing the foundational Northumbrian sound.</li><li><strong>[Timbral Echoes]:</strong>  The deep, resonant bass of Burial is mirrored in the rich, sustained tones of Lau's accordion. The intricate fiddle work in Lau also provides a direct timbral echo to the initial Northumbrian smallpipes and fiddle.</li></ul></div>
+        </div>
+      </div>
+      <div class="node track">
+        <div class="badge">
+          <div class="number">6</div>
+          <span class="type-label">Music</span>
+        </div>
+        <div class="node-content">
+          <h3 class="node-title" style="margin-bottom:0.25rem;">Ghosts</h3>
+          <p style="color:var(--text-secondary); font-size:0.95rem;">by Lau (2019)</p>
+          
+          <iframe src="https://open.spotify.com/embed/track/2U1ncPf7RwyUsb4KMUToPI?utm_source=generator" 
+                  width="100%" height="152" frameBorder="0" allowfullscreen="" 
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                  loading="lazy" style="border-radius: var(--border-radius-sm); margin-top: 1rem;"></iframe>
+        </div>
+      </div>
+      <div class="node voice">
+        <div class="badge">
+          <div class="number">7</div>
+          <span class="type-label">Voice</span>
+        </div>
+        <div class="node-content">
+          <h3 class="node-title">Outro</h3>
+          <p class="script-text">"And so, our journey through hidden anatomies concludes. From Northumbrian traditions to spectral electronica and back to experimental folk—each transition, an act of revealing the deeper currents that connect disparate worlds. Thank you for joining “Joix” on this exploration. Until next time, keep listening, keep connecting, and remember that every sound holds a secret pathway. Goodnight."</p>
+          <audio controls src="episodes/joix_004/chunk_7_outro.mp3"></audio>
+          <div class="track-notes"><ul><li><strong>[Issue Theme]:</strong>  This issue explored the resilience and transformative power of folk traditions, demonstrating how foundational musical elements like drones, driving rhythms, and profound emotional resonance can echo across centuries and genres.</li><li><strong>[Core Philosophy]:</strong>  The playlist aimed to create an "Illusion of Inevitability" by mapping pathways between diverse artists, revealing unexpected connections that make radical shifts feel logical and deeply satisfying.</li></ul></div>
+        </div>
+      </div>
+      </div>
+    </article>
+  </div>
+</body>
+</html>
